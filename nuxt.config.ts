@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   runtimeConfig: {
-    openrouterApiKey: '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', // Se llenará automáticamente con NUXT_OPENROUTER_API_KEY
+    geminiApiKey: '', // Se llenará con NUXT_GEMINI_API_KEY
   },
   modules: [
     '@nuxtjs/tailwindcss',
