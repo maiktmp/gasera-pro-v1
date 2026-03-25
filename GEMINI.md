@@ -16,18 +16,21 @@
 - **Font**: [Inter](https://fonts.google.com/specimen/Inter) (Google Fonts).
 
 ## Project Structure
-The main application is located in the `front/` directory.
+The application is located in the root directory.
 
-- `front/app/pages/`: Contains the main application views (Vue files).
-- `front/app/assets/css/main.css`: Global styles, including Tailwind base/utilities and custom classes (`glass-card`, `primary-gradient`).
-- `front/theme.config.ts`: Custom PrimeVue theme preset (`GaseraTheme`) defining the primary color palette (Red #ef4444) and border-radius (16px).
-- `front/nuxt.config.ts`: Main configuration for the Nuxt application, including module setup and head metadata.
+- `app/pages/`: Contains the main application views (Vue files).
+- `app/assets/css/main.css`: Global styles, including Tailwind base/utilities and custom classes (`glass-card`, `primary-gradient`).
+- `theme.config.ts`: Custom PrimeVue theme preset (`GaseraTheme`) defining the primary color palette (Red #ef4444) and border-radius (16px).
+- `nuxt.config.ts`: Main configuration for the Nuxt application, including module setup and head metadata.
 
 ## Building and Running
-All commands should be executed from within the `front/` directory.
+All commands should be executed from the root directory.
 
+- **Requirements**: Node.js >= 20.0.0
+- **Install dependencies**: `npm install`
 - **Development Server**: `npm run dev`
 - **Build for Production**: `npm run build`
+- **Start Production Server**: `npm run start`
 - **Generate Static Site**: `npm run generate`
 - **Preview Production Build**: `npm run preview`
 - **Nuxt Prepare (Post-install)**: `npm run postinstall`
