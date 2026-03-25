@@ -1,22 +1,22 @@
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig();
-  const body = await readBody(event);
-  const messages = body.messages || [];
+    const config = useRuntimeConfig();
+    const body = await readBody(event);
+    const messages = body.messages || [];
 
-  // Obtenemos la clave de forma segura desde runtimeConfig
-  const OPENROUTER_API_KEY = config.openrouterApiKey;
+    // Obtenemos la clave de forma segura desde runtimeConfig
+    const OPENROUTER_API_KEY = config.openrouterApiKey;
 
-  if (!OPENROUTER_API_KEY) {
-    console.error("[AUTH ERROR] No se detectó NUXT_OPENROUTER_API_KEY en el entorno.");
-  }
+    if (!OPENROUTER_API_KEY) {
+        console.error("[AUTH ERROR] No se detectó NUXT_OPENROUTER_API_KEY en el entorno.");
+    }
 
-  // Debugging seguro de la clave
-  const maskedKey = OPENROUTER_API_KEY 
-    ? `${OPENROUTER_API_KEY.substring(0, 10)}...${OPENROUTER_API_KEY.substring(OPENROUTER_API_KEY.length - 5)}`
-    : "NINGUNA";
-  console.log(`[AUTH CHECK] Usando clave: ${maskedKey}`);
+    // Debugging seguro de la clave
+    const maskedKey = OPENROUTER_API_KEY
+        ? `${OPENROUTER_API_KEY.substring(0, 10)}...${OPENROUTER_API_KEY.substring(OPENROUTER_API_KEY.length - 5)}`
+        : "NINGUNA";
+    console.log(`[AUTH CHECK] Usando clave: ${maskedKey}`);
 
-  const systemPrompt = `
+    const systemPrompt = `
     Eres Gasera Pro AI, un asistente de WhatsApp extremadamente amable y eficiente para una empresa de gas LP en México. 
     Tu objetivo principal es ayudar a los clientes a realizar pedidos de gas de forma rápida y sencilla.
 
@@ -35,34 +35,34 @@ export default defineEventHandler(async (event) => {
     Al final, cuando tengas todo, resume el pedido y confirma que un repartidor va en camino o que quedó programado.
   `;
 
-  // Captura la IP del cliente que está haciendo el pedido
-  const clientIp = getRequestIP(event, { xForwardedFor: true }) || 'IP Desconocida';
-  console.log(`[CHAT REQUEST] IP: ${clientIp} | Timestamp: ${new Date().toISOString()}`);
+    // Captura la IP del cliente que está haciendo el pedido
+    const clientIp = getRequestIP(event, {xForwardedFor: true}) || 'IP Desconocida';
+    console.log(`[CHAT REQUEST] IP: ${clientIp} | Timestamp: ${new Date().toISOString()}`);
 
-  try {
-    const response = await $fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://gasera-pro.com",
-        "X-Title": "Gasera Pro App"
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.0-flash-lite-001", // Modelo ultra rápido y económico
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages
-        ]
-      })
-    });
+    try {
+        const response = await $fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://gasera-pro.com",
+                "X-Title": "Gasera Pro App"
+            },
+            body: JSON.stringify({
+                "model": "openrouter/free",
+                messages: [
+                    {role: "system", content: systemPrompt},
+                    ...messages
+                ]
+            })
+        });
 
-    return response;
-  } catch (error) {
-    console.error("OpenRouter API Error:", error);
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Error al conectar con el servicio de IA."
-    });
-  }
+        return response;
+    } catch (error) {
+        console.error("OpenRouter API Error:", error);
+        throw createError({
+            statusCode: 500,
+            statusMessage: "Error al conectar con el servicio de IA."
+        });
+    }
 });
