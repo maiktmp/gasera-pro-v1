@@ -7,6 +7,10 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   devtools: { enabled: true },
+  runtimeConfig: {
+    // Estas variables solo están disponibles en el servidor
+    openrouterApiKey: process.env.OPENROUTER_API_KEY || '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',
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module'

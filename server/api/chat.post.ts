@@ -3,8 +3,9 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const messages = body.messages || [];
 
-  // API Key obtained from the frontend mockup
-  const OPENROUTER_API_KEY = "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";
+  // Obtenemos la clave de forma segura desde runtimeConfig
+  // En producción (Dockploy), puedes configurar NUXT_OPENROUTER_API_KEY como variable de entorno
+  const OPENROUTER_API_KEY = config.openrouterApiKey;
 
   const systemPrompt = `
     Eres Gasera Pro AI, un asistente de WhatsApp extremadamente amable y eficiente para una empresa de gas LP en México. 
