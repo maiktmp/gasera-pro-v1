@@ -4,11 +4,16 @@ export default defineEventHandler(async (event) => {
   const messages = body.messages || [];
 
   // Obtenemos la clave de forma segura desde runtimeConfig
-  // Prioriza la variable de entorno, de lo contrario un fallback local
-  const OPENROUTER_API_KEY = config.openrouterApiKey || "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";
+  const OPENROUTER_API_KEY = config.openrouterApiKey;
+
+  if (!OPENROUTER_API_KEY) {
+    console.error("[AUTH ERROR] No se detectó NUXT_OPENROUTER_API_KEY en el entorno.");
+  }
 
   // Debugging seguro de la clave
-  const maskedKey = `${OPENROUTER_API_KEY.substring(0, 10)}...${OPENROUTER_API_KEY.substring(OPENROUTER_API_KEY.length - 5)}`;
+  const maskedKey = OPENROUTER_API_KEY 
+    ? `${OPENROUTER_API_KEY.substring(0, 10)}...${OPENROUTER_API_KEY.substring(OPENROUTER_API_KEY.length - 5)}`
+    : "NINGUNA";
   console.log(`[AUTH CHECK] Usando clave: ${maskedKey}`);
 
   const systemPrompt = `
@@ -40,11 +45,11 @@ export default defineEventHandler(async (event) => {
       headers: {
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://gasera-pro.com", // Optional, for OpenRouter analytics
+        "HTTP-Referer": "https://gasera-pro.com",
         "X-Title": "Gasera Pro App"
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-lite-001", // Using a fast, reliable model
+        model: "google/gemini-2.0-flash-lite-001", // Modelo ultra rápido y económico
         messages: [
           { role: "system", content: systemPrompt },
           ...messages
