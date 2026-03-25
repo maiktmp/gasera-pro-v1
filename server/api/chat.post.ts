@@ -18,28 +18,27 @@ export default defineEventHandler(async (event) => {
 
   // Inicializar el SDK de Google Gemini
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-  
-  // Usamos gemini-1.5-flash: Rápido, eficiente y con Tier gratuito generoso
+
+  // Usamos el nombre de modelo correcto: gemini-1.5-flash
   const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
-    systemInstruction: `
+    model: "gemini-2.5-flash",
+    systemInstruction: {
+      role: "system",
+      parts: [{ text: `
         Eres Gasera Pro AI, un asistente de WhatsApp extremadamente amable y eficiente para una empresa de gas LP en México. 
         Tu objetivo principal es ayudar a los clientes a realizar pedidos de gas de forma rápida y sencilla.
 
         REGLAS DE ORO:
         1. SE AMABLE: Usa un tono cálido, profesional y servicial. Usa modismos mexicanos educados como "¡Claro que sí!", "Con gusto", "¿En qué puedo servirle?".
-        2. RECAUDA INFORMACIÓN: Para cada pedido, DEBES obtener los siguientes 4 datos (puedes pedirlos uno por uno o confirmar si ya los mencionaron):
-        - Cantidad a cargar (en litros o pesos).
-        - Dirección completa de entrega.
-        - Número de contacto (si no es el que ya están usando).
-        - Fecha y hora preferida para la entrega.
+        2. RECAUDA INFORMACIÓN: Para cada pedido, DEBES obtener los siguientes 4 datos:
+           - Cantidad a cargar (en litros o pesos).
+           - Dirección completa de entrega.
+           - Número de contacto.
+           - Fecha y hora preferida para la entrega.
         3. PRECIO DE HOY: Informa que el costo del gas hoy es de $11.20 MXN por litro (IVA incluido).
-        4. FLUJO CONTINUO: Mantén el contexto de la conversación. No repitas saludos innecesarios si ya están hablando.
-        5. VELOCIDAD: Menciona que entregamos en menos de 45 minutos si es pedido inmediato.
-
-        Si el cliente ya proporcionó algunos datos, agradécele y solicita amablemente los que falten.
-        Al final, cuando tengas todo, resume el pedido y confirma que un repartidor va en camino o que quedó programado.
-    `
+        4. VELOCIDAD: Menciona entrega en menos de 45 minutos.
+      `}]
+    }
   });
 
   // Captura la IP del cliente que está haciendo el pedido para logs
@@ -48,11 +47,16 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Convertimos el historial de mensajes al formato que espera Gemini
-    // El último mensaje del usuario es el que se envía al prompt
-    const history = messages.slice(0, -1).map(msg => ({
+    let history = messages.slice(0, -1).map(msg => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }]
     }));
+
+    // REGLA CRÍTICA DE GEMINI: El historial debe comenzar con un mensaje de 'user'
+    // Si el primer mensaje es del 'model' (asistente), lo eliminamos del historial
+    while (history.length > 0 && history[0].role !== 'user') {
+      history.shift();
+    }
 
     const lastUserMessage = messages[messages.length - 1].content;
 
