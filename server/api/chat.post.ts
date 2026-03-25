@@ -4,8 +4,12 @@ export default defineEventHandler(async (event) => {
   const messages = body.messages || [];
 
   // Obtenemos la clave de forma segura desde runtimeConfig
-  // En producción (Dockploy), puedes configurar NUXT_OPENROUTER_API_KEY como variable de entorno
-  const OPENROUTER_API_KEY = config.openrouterApiKey;
+  // Prioriza la variable de entorno, de lo contrario un fallback local
+  const OPENROUTER_API_KEY = config.openrouterApiKey || "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";
+
+  // Debugging seguro de la clave
+  const maskedKey = `${OPENROUTER_API_KEY.substring(0, 10)}...${OPENROUTER_API_KEY.substring(OPENROUTER_API_KEY.length - 5)}`;
+  console.log(`[AUTH CHECK] Usando clave: ${maskedKey}`);
 
   const systemPrompt = `
     Eres Gasera Pro AI, un asistente de WhatsApp extremadamente amable y eficiente para una empresa de gas LP en México. 
