@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   runtimeConfig: {
-    geminiApiKey: 'AIzaSyAjtIz5zxVWRJS0ZHUJPXBf7oQF-zBQnQ4', // Se llenará con NUXT_GEMINI_API_KEY
+    geminiApiKey: '', // Se llenará con NUXT_GEMINI_API_KEY
   },
   modules: [
     '@nuxtjs/tailwindcss',
